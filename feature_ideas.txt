@@ -1,0 +1,2 @@
+datetime of phone calls - calling at weird times of day might be bad (mod timestamp to get time in day)
+other loans - can be found through sms data (non-number sms_address)
