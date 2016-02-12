@@ -1,2 +1,4 @@
-datetime of phone calls - calling at weird times of day might be bad (mod timestamp to get time in day)
-other loans - can be found through sms data (non-number sms_address)
+time of day of phone calls - calling at weird times of day might be bad (mod timestamp to get time in day)
+total duration of phone calls - if they are on the phone a lot, they could have a good amount of capital (more expensive than texting)
+number of non-number SMS addresses - these are usually sent by companies, could imply business involvement
+other loans - look for word "loan" in message bodies

@@ -63,7 +63,7 @@ class DataManager:
 		print "Baseline: ", baseline
 
 		rf = RandomForestClassifier(n_estimators=500, max_features='sqrt', bootstrap=True, min_samples_leaf=4) # chosen with x-validation
-		svm = SVC(C=0.000000001, gamma=0.1) # chosen with x-validation
+		svm = SVC(C=100, gamma=0.25) # chosen with x-validation
 
 		rf_scores = []
 		rf_true_positives = []
@@ -78,6 +78,7 @@ class DataManager:
 
 			train_ft, test_ft, train_label, test_label = cross_validation.train_test_split(fts, labels, test_size=0.2, random_state=i)
 
+			# remove first ft since it's just uid, used to generate labels
 			train_ft = train_ft[:,1:8]
 			test_ft = test_ft[:,1:8]
 
@@ -87,8 +88,8 @@ class DataManager:
 
 
 
-			svm_train_ft = train_ft[:,0:1]
-			svm_test_ft = test_ft[:,0:1]
+			svm_train_ft = train_ft[:,0:2]
+			svm_test_ft = test_ft[:,0:2]
 			svm.fit(svm_train_ft, train_label)
 			svm_scores.append(svm.score(svm_test_ft, test_label))
 			svm_predictions = svm.predict(svm_test_ft)
@@ -130,7 +131,6 @@ class DataManager:
 			if sum(ft) > uid:	
 				fts.append(ft)
 
-			# if uid%100 == 0:
 			print uid
 
 		return np.array(fts)
