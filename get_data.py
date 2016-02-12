@@ -81,7 +81,6 @@ class DataManager:
 		for item in user_data:
 			time_of_day = long(item['datetime']) % ONE_DAY
 			calls_per_quarter_day[time_of_day/QUARTER_DAY] += 1
-			print item
 			total_duration += int(item['duration'])
 
 		return calls_per_quarter_day + [total_duration]
