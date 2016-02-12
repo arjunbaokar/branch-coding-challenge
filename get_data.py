@@ -59,9 +59,9 @@ class DataManager:
 			call_log = self.db.test.find({'uid': uid, 'key_type': 'call_log'})
 			ft += self.call_log_features(call_log)
 			sms_log = self.db.test.find({'uid': uid, 'key_type': 'sms_log'})
-			ft += self.call_log_features(sms_log)
-			contact_list = self.db.test.find({'uid': uid, 'key_type': 'contact_list'})
-			ft += self.contact_list_features(contact_list)
+			ft += self.sms_log_features(sms_log)
+			# contact_list = self.db.test.find({'uid': uid, 'key_type': 'contact_list'})
+			# ft += self.contact_list_features(contact_list)
 
 			if sum(ft) > uid:
 				fts.append(ft)
