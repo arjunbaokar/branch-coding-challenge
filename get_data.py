@@ -76,7 +76,7 @@ class DataManager:
 			# contact_list = self.db.test.find({'uid': uid, 'key_type': 'contact_list'})
 			# ft += self.contact_list_features(contact_list)
 
-			if sum(ft) > uid:
+			if sum(ft) > uid:	
 				fts.append(ft)
 
 			# if uid%100 == 0:
