@@ -95,23 +95,19 @@ class DataManager:
 			svm_predictions = svm.predict(svm_test_ft)
 
 			roc_svm_score = svm.decision_function(svm_test_ft)
-			# print roc_svm_score
+			print roc_svm_score
 
 			fpr, tpr, thresholds = roc_curve(test_label, roc_svm_score)
 			roc_auc = auc(fpr, tpr)
 
-			# print np.mean(rf_predictions), np.mean(svm_predictions)
-
-			# print fpr, tpr, roc_auc
-
-			# break
+			print "FPR", fpr, "TPR:", tpr, "ROC_AUC:", roc_auc
 
 
-			print rf.feature_importances_
+			print "Feature importances", rf.feature_importances_
 
 		avg_rf_score = sum(rf_scores) / float(len(rf_scores))
 		avg_svm_score = sum(svm_scores) / float(len(svm_scores))
-		print avg_rf_score, avg_svm_score
+		print "avg RF accuracy:", avg_rf_score, "avg SVM accuracy:", avg_svm_score
 
 
 	# Returns a numpy 2-D array of features where each row is the features for a given user

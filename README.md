@@ -8,7 +8,12 @@
 
 - Feature extraction is really slow: ~16min. It's the slowdown in reading the cursor from MongoDB though. This made the entire debugging process pretty slow. I adapted by writing features to a file once they were extracted, so each run wouldn't need to read features.
 
-Time Distribution (total 6hrs):
+
+Time Distribution (total 6.5 hours):
+~0.5 hours planning the system, understanding data and stuff
 ~1.5 hours to set up AWS + Mongo, since it was my first time using either of them
-~2.5 hours to get feature extraction up and working
-~2 hours spent tuning models and trying to fix SVM
+~3 hours to get feature extraction up and working, given that it took forever
+~1.5 hours spent tuning models and trying to fix SVM
+
+Given more time:
+I'd look for better features, since that's what is probably causing all of the issues with the model.
