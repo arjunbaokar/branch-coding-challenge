@@ -4,6 +4,7 @@ import json
 import numpy as np
 from pymongo import MongoClient
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 from sklearn import cross_validation
 
 class DataManager:
@@ -52,13 +53,35 @@ class DataManager:
 					print "Reached ", user_id
 
 	def train_model(self):
-		fts = self.generate_features()
+		# fts = self.generate_features()
+		# np.savetxt('features.txt', fts)
+		fts = np.loadtxt('features.txt')
 		labels = self.generate_labels(fts)
-		rf = RandomForestClassifier(n_estimators=100, max_features='sqrt', min_samples_split=10)
+		baseline = np.sum(labels)/float(fts.shape[0])
+
+		print "Baseline: ", baseline
+
+		rf = RandomForestClassifier(n_estimators=500, max_features='sqrt', bootstrap=True, min_samples_leaf=4)
+		svm = SVC(C=0.01)
+
+		rf_scores = []
+		svm_scores = []
+		true_positives = []
+
 		for i in range(5):
-			train_ft, test_ft, train_label, test_label = cross_validation.train_test_fit(fts, labels, test_size=0.33)
-			rf = fit(train_ft, train_label)
-			print rf.score(test_ft, test_label)
+			train_ft, test_ft, train_label, test_label = cross_validation.train_test_split(fts, labels, test_size=0.2, random_state=i)
+			rf = rf.fit(train_ft, train_label)
+			rf_scores.append(rf.score(test_ft, test_label))
+
+			svm_train_ft = train_ft[:,:7]
+			svm.fit(svm_train_ft, train_label)
+			svm_scores.append(svm.score(test_ft[:,:7], test_label))
+
+			print rf.feature_importances_
+
+		avg_rf_score = sum(rf_scores) / float(len(rf_scores))
+		avg_svm_score = sum(svm_scores) / float(len(svm_scores))
+		print avg_rf_score, avg_svm_score
 
 
 
@@ -135,7 +158,7 @@ class DataManager:
 			if fts[i][0] in delinquent_users:
 				labels.append(0)
 			else:
-				labels.append(0)
+				labels.append(1)
 
 		return np.array(labels)
 
