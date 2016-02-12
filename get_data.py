@@ -55,13 +55,21 @@ class DataManager:
 		max_uid = self.db.test.find_one(sort=[('uid', -1)])['uid']
 
 		for uid in range(max_uid+1):
+			ft = [uid]
 			call_log = self.db.test.find({'uid': uid, 'key_type': 'call_log'})
-			print self.call_log_features(call_log)
-
+			ft += self.call_log_features(call_log)
 			sms_log = self.db.test.find({'uid': uid, 'key_type': 'sms_log'})
+			ft += self.call_log_features(sms_log)
 			contact_list = self.db.test.find({'uid': uid, 'key_type': 'contact_list'})
+			ft += self.contact_list_features(contact_list)
 
-			# break # FIXME: remove me
+			if sum(ft) > uid:
+				fts.append(ft)
+
+			if uid%100 == 0:
+				print uid
+
+		print fts
 
 	# Generates call log features for single user
 	def call_log_features(self, user_data):
@@ -71,19 +79,32 @@ class DataManager:
 		QUARTER_DAY = ONE_DAY/4
 
 		for item in user_data:
-			time_of_day = item['datetime'] % ONE_DAY
+			time_of_day = long(item['datetime']) % ONE_DAY
 			calls_per_quarter_day[time_of_day/QUARTER_DAY] += 1
-			total_duration += item['duration']
+			print item
+			total_duration += int(item['duration'])
 
 		return calls_per_quarter_day + [total_duration]
 
 	# Generates sms features for single user
 	def sms_log_features(self, user_data):
-		return
+		special_entities = 0
+		other_loans = 0
+		for item in user_data:
+			try:
+				long(item['phone_number'])
+			except:
+				special_entities += 1
+
+			if other_loans == 0:
+				if 'loan' in item['message_body']:
+					other_loans = 1
+
+		return [special_entities] + [other_loans]
 
 	# Generates contacts features for single user
 	def contact_list_features(self, user_data):
-		return
+		return []
 
 	# Return a numpy array of labels {0,1}^K, where K is the number of users.
 	# 0 if bad (delinquent) borrower, 1 if good borrower. Labels are determined from delinquent borrower list.
