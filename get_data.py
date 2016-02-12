@@ -56,17 +56,26 @@ class DataManager:
 
 		for uid in range(max_uid+1):
 			call_log = self.db.test.find({'uid': uid, 'key_type': 'call_log'})
-			self.call_log_features(call_log)
+			print self.call_log_features(call_log)
 
 			sms_log = self.db.test.find({'uid': uid, 'key_type': 'sms_log'})
 			contact_list = self.db.test.find({'uid': uid, 'key_type': 'contact_list'})
 
-			break # FIXME: remove me
+			# break # FIXME: remove me
 
 	# Generates call log features for single user
 	def call_log_features(self, user_data):
+		calls_per_quarter_day = [0, 0, 0, 0]
+		total_duration = 0
+		ONE_DAY = 24*60*60*1000
+		QUARTER_DAY = ONE_DAY/4
+
 		for item in user_data:
-			print item
+			time_of_day = item['datetime'] % ONE_DAY
+			calls_per_quarter_day[time_of_day/QUARTER_DAY] += 1
+			total_duration += item['duration']
+
+		return calls_per_quarter_day + list(total_duration)
 
 	# Generates sms features for single user
 	def sms_log_features(self, user_data):
