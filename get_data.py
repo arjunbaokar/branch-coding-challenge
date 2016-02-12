@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn import cross_validation
+from sklearn.metrics import roc_curve, auc
 
 class DataManager:
 
@@ -61,28 +62,55 @@ class DataManager:
 
 		print "Baseline: ", baseline
 
-		rf = RandomForestClassifier(n_estimators=500, max_features='sqrt', bootstrap=True, min_samples_leaf=4)
-		svm = SVC(C=0.01)
+		rf = RandomForestClassifier(n_estimators=500, max_features='sqrt', bootstrap=True, min_samples_leaf=4) # chosen with x-validation
+		svm = SVC(C=0.000000001, gamma=0.1) # chosen with x-validation
 
 		rf_scores = []
+		rf_true_positives = []
+		rf_false_positives = []
+		rf_false_negatives = []
 		svm_scores = []
-		true_positives = []
+		svm_true_positives = []
+		svm_false_positives = []
+		svm_false_negatives = []
 
 		for i in range(5):
+
 			train_ft, test_ft, train_label, test_label = cross_validation.train_test_split(fts, labels, test_size=0.2, random_state=i)
+
+			train_ft = train_ft[:,1:8]
+			test_ft = test_ft[:,1:8]
+
 			rf = rf.fit(train_ft, train_label)
 			rf_scores.append(rf.score(test_ft, test_label))
+			rf_predictions = rf.predict(test_ft)
 
-			svm_train_ft = train_ft[:,:7]
+
+
+			svm_train_ft = train_ft[:,0:1]
+			svm_test_ft = test_ft[:,0:1]
 			svm.fit(svm_train_ft, train_label)
-			svm_scores.append(svm.score(test_ft[:,:7], test_label))
+			svm_scores.append(svm.score(svm_test_ft, test_label))
+			svm_predictions = svm.predict(svm_test_ft)
+
+			roc_svm_score = svm.decision_function(svm_test_ft)
+			# print roc_svm_score
+
+			fpr, tpr, thresholds = roc_curve(test_label, roc_svm_score)
+			roc_auc = auc(fpr, tpr)
+
+			# print np.mean(rf_predictions), np.mean(svm_predictions)
+
+			# print fpr, tpr, roc_auc
+
+			# break
+
 
 			print rf.feature_importances_
 
 		avg_rf_score = sum(rf_scores) / float(len(rf_scores))
 		avg_svm_score = sum(svm_scores) / float(len(svm_scores))
 		print avg_rf_score, avg_svm_score
-
 
 
 	# Returns a numpy 2-D array of features where each row is the features for a given user
