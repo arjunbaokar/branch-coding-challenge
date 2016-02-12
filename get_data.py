@@ -3,6 +3,8 @@ import boto
 import json
 import numpy as np
 from pymongo import MongoClient
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import cross_validation
 
 class DataManager:
 
@@ -49,6 +51,17 @@ class DataManager:
 				if user_id % 1000 == 0:
 					print "Reached ", user_id
 
+	def train_model(self):
+		fts = self.generate_features()
+		labels = self.generate_labels(fts)
+		rf = RandomForestClassifier(n_estimators=100, max_features='sqrt', min_samples_split=10)
+		for i in range(5):
+			train_ft, test_ft, train_label, test_label = cross_validation.train_test_fit(fts, labels, test_size=0.33)
+			rf = fit(train_ft, train_label)
+			print rf.score(test_ft, test_label)
+
+
+
 	# Returns a numpy 2-D array of features where each row is the features for a given user
 	def generate_features(self):
 		fts = []
@@ -66,10 +79,10 @@ class DataManager:
 			if sum(ft) > uid:
 				fts.append(ft)
 
-			if uid%100 == 0:
-				print uid
+			# if uid%100 == 0:
+			print uid
 
-		print fts
+		return np.array(fts)
 
 	# Generates call log features for single user
 	def call_log_features(self, user_data):
@@ -131,5 +144,6 @@ class DataManager:
 
 dm = DataManager()
 # dm.populate_db()
-dm.generate_features()
+# dm.generate_features()
 # dm.generate_labels()
+dm.train_model()
