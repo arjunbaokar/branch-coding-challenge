@@ -75,7 +75,7 @@ class DataManager:
 			calls_per_quarter_day[time_of_day/QUARTER_DAY] += 1
 			total_duration += item['duration']
 
-		return calls_per_quarter_day + list(total_duration)
+		return calls_per_quarter_day + [total_duration]
 
 	# Generates sms features for single user
 	def sms_log_features(self, user_data):
